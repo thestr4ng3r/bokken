@@ -410,17 +410,7 @@ class Core(lib.backend.BasicBackend):
             cmd = 'agc '
 
         if not addr:
-            sct = False
-            for section in self.execsections:
-                if '.text' in section:
-                    self.send_cmd(cmd + 'section..text > ' + file.name)
-                    sct = False
-                    break
-                else:
-                    sct = True
-            if sct:
-                self.send_cmd(cmd + 'section' + self.execsections[0][0] +' > ' + file.name)
-            #self.send_cmd_str('aga > ' + file.name)
+            self.send_cmd(cmd + 'entry0 > ' + file.name)
         else:
             self.send_cmd(cmd + addr + ' > ' + file.name)
         file.close()
