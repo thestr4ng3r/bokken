@@ -76,7 +76,7 @@ class Pen:
     def highlighted(self):
         pen = self.copy()
         pen.color = (1, 0, 0, 1)
-        pen.fillcolor = (1, .8, .8, 1)
+        #pen.fillcolor = (1, .8, .8, 1)
         return pen
 
 
@@ -206,7 +206,9 @@ class TextShape(Shape):
 
         cr.save()
         cr.scale(f, f)
-        cr.set_source_rgba(*self.select_pen(highlight).color)
+        # Always pass False to avoid text highlight
+        #cr.set_source_rgba(*self.select_pen(highlight).color)
+        cr.set_source_rgba(*self.select_pen(False).color)
         PangoCairo.show_layout(cr, layout)
         cr.restore()
 
@@ -1511,7 +1513,8 @@ class ZoomAreaAction(DragAction):
         self.dot_widget.queue_draw()
 
 
-class DotWidget(Gtk.DrawingArea):
+#class DotWidget(Gtk.DrawingArea):
+class DotWidget(Gtk.Layout):
     """GTK widget that draws dot graphs."""
 
     #TODO GTK3: Second argument has to be of type Gdk.EventButton instead of object.
@@ -1522,7 +1525,8 @@ class DotWidget(Gtk.DrawingArea):
     filter = 'dot'
 
     def __init__(self):
-        Gtk.DrawingArea.__init__(self)
+        #Gtk.DrawingArea.__init__(self)
+        Gtk.Layout.__init__(self)
 
         self.graph = Graph()
         self.openfilename = None
@@ -1635,11 +1639,19 @@ class DotWidget(Gtk.DrawingArea):
         return True
 
     def on_draw(self, widget, cr):
-        cr.set_source_rgba(1.0, 1.0, 1.0, 1.0)
+        rect = self.get_allocation()
+        window = self.get_bin_window()
+        cr = window.cairo_create()
+        lg3 = cairo.LinearGradient(0, 0, 0, rect.height)
+
+        # Add Blue and White background
+        lg3.add_color_stop_rgba(0.5, 1.0, 1.0, 1.0, 1.0)
+        lg3.add_color_stop_rgba(0.99, 0.8, 0.8, 1.0, 1.0)
+        cr.set_source(lg3)
+
         cr.paint()
 
         cr.save()
-        rect = self.get_allocation()
         cr.translate(0.5*rect.width, 0.5*rect.height)
         cr.scale(self.zoom_ratio, self.zoom_ratio)
         cr.translate(-self.x, -self.y)
