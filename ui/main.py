@@ -165,7 +165,8 @@ class BokkenGTKClient:
         # Create top buttons and add to VBox
         import ui.radare_toolbar as toolbar
         self.topbuttons = toolbar.TopButtons(self.uicore, self)
-        self.supervb.pack_start(self.topbuttons, False, True, 1)
+        self.topbuttons.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR)
+        self.supervb.pack_start(self.topbuttons, False, True, 0)
 
         # Create VBox to contain textviews and statusbar
         self.mainvb = Gtk.VBox(False, 1)
