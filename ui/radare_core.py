@@ -452,12 +452,13 @@ class Core(lib.backend.BasicBackend):
                     if len(line) == 5:
                         self.full_fileinfo['imports'].append(line)
             # Get entry points
+            # TODO: make this work as it should again (e.g. parse json)
             entryp = self.send_cmd_str('iej')
             if entryp:
                 self.full_fileinfo['eps'] = []
                 for line in entryp.split('\n'):
                     line = line.strip('[').strip(']')
-                    self.full_fileinfo['eps'].append(['Entry0', hex(int(line))])
+                    self.full_fileinfo['eps'].append(['Entry0', str(line)])
             # Get symbols
             symbols = self.send_cmd_str('is')
             if symbols:

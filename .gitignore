@@ -9,3 +9,5 @@ debian/bokken/
 debian/*debhelper*
 debian/*substvars
 .pc/
+
+.idea/

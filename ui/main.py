@@ -100,7 +100,10 @@ class BokkenGTKClient:
         Gtk.Settings.get_default().set_long_property("gtk-button-images", True, "main")
 
         # Title
-        self.window.set_title(MAINTITLE + glob.version + " - " + self.target)
+        title = MAINTITLE + glob.version
+        if self.target is not None:
+            title += " - " + str(self.target)
+        self.window.set_title(title)
 
         # Launch file selection dialog
         dialog = file_dialog.FileDialog(self, self.target, True)
