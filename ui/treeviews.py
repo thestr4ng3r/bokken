@@ -40,13 +40,17 @@ class TreeViews(Gtk.TreeView):
         self.popup_handler = self.connect('button-press-event', self.popup_menu)
         self.popup_handler = self.connect('row-activated', self.popup_menu)
 
+        self.fcn_pix = GdkPixbuf.Pixbuf.new_from_file(datafile_path('function.png'))
+        self.bb_pix = GdkPixbuf.Pixbuf.new_from_file(datafile_path('block.png'))
+        self.data_sec_pix = GdkPixbuf.Pixbuf.new_from_file(datafile_path('data-sec.png'))
+        self.exp_pix = GdkPixbuf.Pixbuf.new_from_file(datafile_path('export.png'))
+        self.imp_pix = GdkPixbuf.Pixbuf.new_from_file(datafile_path('import.png'))
+
     def create_functions_columns(self):
 
         rendererText = Gtk.CellRendererText()
         rendererText.tooltip_handle = self.connect('motion-notify-event', self.fcn_tooltip)
         rendererPix = Gtk.CellRendererPixbuf()
-        self.fcn_pix = GdkPixbuf.Pixbuf.new_from_file(datafile_path('function.png'))
-        self.bb_pix = GdkPixbuf.Pixbuf.new_from_file(datafile_path('block.png'))
         column = Gtk.TreeViewColumn("Function")
         column.set_spacing(5)
         column.pack_start(rendererPix, False)
@@ -60,7 +64,6 @@ class TreeViews(Gtk.TreeView):
 
     def create_relocs_columns(self):
 
-        self.data_sec_pix = GdkPixbuf.Pixbuf.new_from_file(datafile_path('data-sec.png'))
         rendererPix = Gtk.CellRendererPixbuf()
         rendererText = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn("Name")
@@ -85,7 +88,6 @@ class TreeViews(Gtk.TreeView):
 
     def create_exports_columns(self):
 
-        self.exp_pix = GdkPixbuf.Pixbuf.new_from_file(datafile_path('export.png'))
         rendererPix = Gtk.CellRendererPixbuf()
         rendererText = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn("Offset")
@@ -122,7 +124,6 @@ class TreeViews(Gtk.TreeView):
 
         self.treestore = Gtk.TreeStore(GdkPixbuf.Pixbuf, str)
 
-        self.imp_pix = GdkPixbuf.Pixbuf.new_from_file(datafile_path('import.png'))
         rendererPix = Gtk.CellRendererPixbuf()
         rendererText = Gtk.CellRendererText()
         imports.pack_start(rendererPix, False)
@@ -141,12 +142,36 @@ class TreeViews(Gtk.TreeView):
         self.set_model(self.treestore)
         self.expand_all()
 
+    def create_classes_tree(self):
+
+        self.treestore = Gtk.TreeStore(GdkPixbuf.Pixbuf, str, str)
+
+        renderer_pix = Gtk.CellRendererPixbuf()
+        renderer_text = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn()
+        column.set_title("Offset")
+        column.set_spacing(5)
+        column.pack_start(renderer_pix, True)
+        column.pack_start(renderer_text, False)
+        column.set_attributes(renderer_pix, pixbuf=0)
+        column.set_attributes(renderer_text, text=1)
+        self.append_column(column)
+
+        renderer_text = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn("Name", renderer_text, text=2)
+        column.set_sort_column_id(2)
+        self.append_column(column)
+
+        self.set_model(self.treestore)
+        self.expand_all()
+
     def search_and_graph(self, widget, link_name):
         self.textviews.search(widget, link_name)
         if self.dograph:
             self.textviews.update_graph(widget, link_name)
 
     def fcn_tooltip(self, widget, event):
+        return
         x = int(event.x)
         y = int(event.y)
         tup = widget.get_path_at_pos(x, y)
@@ -207,18 +232,21 @@ class TreeViews(Gtk.TreeView):
         else:
             self.uicore.core.cmd0('e io.va=1')
 
+        # Is it over a plugin name?
+        # Get the information about the row.
+
+        if self.get_model() == self.treestore:
+            link_name = self.treestore[path][1]
+            print("Link Name " + link_name)
+        else:
+            link_name = self.store[path][1]
+            # Special for exports
+            if '0x' in link_name:
+                link_name = self.store[path][2]
+
         # Main loop, deciding whether to take an action or display a pop-up.
         if primary_action:
             # It's a left click or Enter on a row.
-            # Is it over a plugin name?
-            # Get the information about the row.
-            if len(path) == 1:
-                link_name = self.store[path][1]
-                # Special for exports
-                if '0x' in link_name:
-                    link_name = self.store[path][2]
-            else:
-                link_name = self.treestore[path][1]
 
             # Detect if search string is from URL or PE/ELF
             link_name = link_name.split("\t")
@@ -244,12 +272,6 @@ class TreeViews(Gtk.TreeView):
         else:
             # It's a right click!
             _time = event.time
-            # Is it over a plugin name?
-            # Get the information about the click.
-            if len(path) == 1:
-                link_name = self.store[path][1]
-            else:
-                link_name = self.treestore[path][1]
 
             # Detect if search string is from URL or PE/ELF
             link_name = link_name.split("\t")

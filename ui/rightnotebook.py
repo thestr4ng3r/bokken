@@ -33,6 +33,7 @@ class RightNotebook(Gtk.Notebook):
         self.scrolled_window = self.tviews.right_textview
         self.strings_treeview = self.tviews.strings_treeview
         self.sections_treeview = self.tviews.sections_treeview
+        self.classes_treeview = self.tviews.classes_treeview
         self.hexdump_view = self.tviews.hexdump_view
         self.bindiff = self.tviews.bindiff
         self.info_elements = self.tviews.info_widget
@@ -95,6 +96,17 @@ class RightNotebook(Gtk.Notebook):
         #self.set_tab_label_packing(self.sections_treeview, False, False, Gtk.PACK_START)
         self.set_tab_label(self.sections_treeview, tab)
 
+
+        #################################################
+        # Classes view TAB
+        self.append_page(self.classes_treeview)
+        tab = self.create_tab('Classes', self.classes_treeview, 'INDENT')
+
+        #self.set_tab_label_packing(self.sections_treeview, False, False, Gtk.PACK_START)
+        self.set_tab_label(self.classes_treeview, tab)
+
+
+
         self.add_info_elements_tab()
 
         self.connect("switch-page", self.on_switch)
@@ -105,6 +117,7 @@ class RightNotebook(Gtk.Notebook):
             self.remove_page(1)
             self.remove_page(0)
             self.remove_page(2)
+            # TODO: remove classes page
             self.set_current_page(0)
         elif self.uicore.core.format in ['Program', 'PE', 'ELF']:
             # Set flowgraph view as default while disassembly finishes

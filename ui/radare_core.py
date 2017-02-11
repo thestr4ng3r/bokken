@@ -22,6 +22,7 @@ import lib.backend
 import os
 import re
 import tempfile
+import json
 
 from r2.r_core import *
 from r2.r_bin import *
@@ -60,6 +61,12 @@ class Core(lib.backend.BasicBackend):
             print('DEBUG OUT: %s' % output)
         return output
 
+    def send_cmd_json(self, cmd):
+        '''This function is in the middle of the communication of the core and
+        Bokken to be able to intercept input and output.'''
+        return json.loads(self.send_cmd_str(cmd))
+
+
     def clean_fullvars(self):
         '''Function to initialize members in the Core class.  Common (i.e.
         non-r2) variables should be migrated to the BasicCore class.'''
@@ -72,6 +79,7 @@ class Core(lib.backend.BasicBackend):
         self.allstrings = []
         self.allrelocs = []
         self.allfuncs = []
+        self.allclasses = []
         self.allsections = []
         self.execsections = []
         self.sections_size = []
@@ -265,6 +273,13 @@ class Core(lib.backend.BasicBackend):
                     fcn = fcn.split(' ')[-1]
                     self.allfuncs.append(fcn)
         return self.allfuncs
+
+    def get_classes(self):
+        if not self.allclasses:
+            self.update_progress_bar("Getting classes", 0.8)
+            classes = self.send_cmd_json("icj")
+            self.allclasses.extend(classes)
+        return self.allclasses
 
     def get_hexdump(self):
         self.update_progress_bar("Getting hexdump", 0.75)

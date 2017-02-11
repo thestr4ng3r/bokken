@@ -29,6 +29,7 @@ import ui.python_textview as python_textview
 import ui.right_textview as right_textview
 import ui.strings_treeview as strings_treeview
 import ui.sections_treeview as sections_treeview
+import ui.classes_treeview as classes_treeview
 import ui.hexdump_view as hexdump_view
 import ui.bindiff as bindiff
 import ui.info_tree as info_tree
@@ -116,6 +117,12 @@ class TextViews(Gtk.HBox):
         #################################################################
 
         self.sections_treeview = sections_treeview.SectionsView(self.uicore, self)
+
+        #################################################################
+        # Classes Treeview
+        #################################################################
+
+        self.classes_treeview = classes_treeview.ClassesView(self.uicore, self)
 
         #################################################################
         # Bindiff widget
@@ -277,6 +284,13 @@ class TextViews(Gtk.HBox):
                 if len(export) < 5:
                     export.insert(0, self.left_treeview.exp_pix)
                 self.left_treeview.store.append(export)
+        elif mode == 'Classes':
+            self.left_treeview.create_classes_tree()
+            for cls in self.uicore.get_classes():
+                print cls
+                cls_it = self.left_treeview.treestore.append(None, [self.left_treeview.exp_pix, hex(cls["addr"]), cls["classname"]])
+                for method in cls["methods"]:
+                    self.left_treeview.treestore.append(cls_it, [self.left_treeview.fcn_pix, hex(method["addr"]), method["name"]])
 
     def _hide_tb_toggled(self, widget):
         if widget.get_active():

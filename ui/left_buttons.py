@@ -48,6 +48,8 @@ class LeftButtons(Gtk.VBox):
         self.imp_pix.set_from_file(datafile_path('import.png'))
         self.exp_pix = Gtk.Image()
         self.exp_pix.set_from_file(datafile_path('export.png'))
+        self.cls_pix = Gtk.Image()
+        self.cls_pix.set_from_file(datafile_path('function.png')) # TODO: class icon
 
         # Show/hide toolbar and menu
         self.hide_tb = Gtk.ToggleButton()
@@ -113,9 +115,22 @@ class LeftButtons(Gtk.VBox):
                 a.pack_start(self.bb_pix, False, False, 1)
                 sectb.add(a)
 
+                # Classes
+                clstb = Gtk.ToggleButton()
+                clstb.set_tooltip_text('List of classes and methods')
+                handler = clstb.connect('toggled', self._on_toggle)
+                clstb.handler = handler
+                a = Gtk.VBox(False, 1)
+                l = Gtk.Label(label='Classes')
+                l.set_angle(90)
+                a.pack_start(l, False, False, 1)
+                a.pack_start(self.cls_pix, False, False, 1)
+                clstb.add(a)
+
                 self.pack_start(imptb, False, False, 0)
                 self.pack_start(exptb, False, False, 0)
                 self.pack_start(sectb, False, False, 0)
+                self.pack_start(clstb, False, False, 0)
 
         self.show_all()
 
